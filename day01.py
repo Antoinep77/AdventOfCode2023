@@ -1,4 +1,4 @@
-from tools.fetch import submit
+from tools.fetch import submit, pullProblem
 
 def answer(data):
     return sum([answerLine(l) for l in data])

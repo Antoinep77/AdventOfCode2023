@@ -25,7 +25,8 @@ def getExampleAnswer(pageTree, level):
 def sendAnswer(day, level, answer):
     resp = requests.post(f"https://adventofcode.com/2023/day/{day}/answer", headers=COOKIE_HEADERS,
                           data={"answer":answer, "level": level})
-    return html.fromstring(resp.content).xpath("//main/article/p")[0].text
+    tree =  html.fromstring(resp.content)
+    return html.tostring(tree.xpath("//main/article")[0])
 
 def submit(day, level,function):
     pageTree = html.fromstring(getPage(day))
@@ -34,4 +35,11 @@ def submit(day, level,function):
         print(f"Wrong answer: ")
         return
     print(sendAnswer(day, level, function(getInput(day))))
+    pullProblem(day)
 
+def pullProblem(day):
+    pageTree = html.fromstring(getPage(day))
+    articles = [ html.tostring(article) for article in pageTree.xpath("//main/article")]
+    for i in range(len(articles)):
+        with open(f"day{day:02d}_level{i+1}.md", "wb") as f:
+            f.write(articles[i])
