@@ -1,4 +1,5 @@
 import requests
+from pathlib import Path
 from lxml import html
 from tools.cookie import COOKIE
 
@@ -40,6 +41,7 @@ def submit(day, level,function):
 def pullProblem(day):
     pageTree = html.fromstring(getPage(day))
     articles = [ html.tostring(article) for article in pageTree.xpath("//main/article")]
+    Path(f"day{day:02d}").mkdir(parents=True, exist_ok=True)
     for i in range(len(articles)):
-        with open(f"day{day:02d}_level{i+1}.md", "wb") as f:
+        with open(f"day{day:02d}/level{i+1}.md", "wb") as f:
             f.write(articles[i])
