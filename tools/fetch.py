@@ -8,15 +8,15 @@ COOKIE_HEADERS = {"cookie": COOKIE }
 def getPage(day):
     return requests.get(f"https://adventofcode.com/2023/day/{day}", headers=COOKIE_HEADERS).content
 
-def getExemple(pageTree, level):
+def getExemple(pageTree, level, prepareInput):
     rawInput = pageTree.xpath("//pre/code")[level-1].text
     return prepareInput(rawInput)
 
-def getInput(day):
+def getInput(day,prepareInput):
     rawInput = requests.get(f"https://adventofcode.com/2023/day/{day}/input", headers=COOKIE_HEADERS).text
     return prepareInput(rawInput)
 
-def prepareInput(rawInput):
+def defaultPrepareInput(rawInput):
     return rawInput.split("\n")[:-1]
 
 def getExampleAnswer(pageTree, level):    
@@ -30,14 +30,14 @@ def sendAnswer(day, level, answer):
     tree =  html.fromstring(resp.content)
     return html.tostring(tree.xpath("//main/article")[0])
 
-def submit(day, level,function):
+def submit(day, level,function, prepareInput=defaultPrepareInput,skipVerification=False):
     pageTree = html.fromstring(getPage(day))
-    exampleAnswer = function(getExemple(pageTree, level))
-    expectedAnswer = getExampleAnswer(pageTree,level)
-    if (exampleAnswer != expectedAnswer):
+    exampleAnswer = function(getExemple(pageTree, level, prepareInput)) if not skipVerification else None
+    expectedAnswer = getExampleAnswer(pageTree,level,)
+    if (not skipVerification and exampleAnswer != expectedAnswer):
         print(f"Wrong answer: {exampleAnswer}, expected: {expectedAnswer}")
         return
-    print(sendAnswer(day, level, function(getInput(day))))
+    print(sendAnswer(day, level, function(getInput(day, prepareInput))))
     pullProblem(day)
 
 def pullProblem(day):
