@@ -19,8 +19,9 @@ def getInput(day):
 def prepareInput(rawInput):
     return rawInput.split("\n")[:-1]
 
-def getExampleAnswer(pageTree, level):
-    return int(pageTree.xpath("//code/em")[level-1].text)
+def getExampleAnswer(pageTree, level):    
+    article = html.tostring(pageTree.xpath("//main/article")[level-1])
+    return int(html.fromstring(article).xpath("//code/em")[-1].text)
 
 
 def sendAnswer(day, level, answer):
@@ -32,8 +33,9 @@ def sendAnswer(day, level, answer):
 def submit(day, level,function):
     pageTree = html.fromstring(getPage(day))
     exampleAnswer = function(getExemple(pageTree, level))
-    if (exampleAnswer != getExampleAnswer(pageTree,level)):
-        print(f"Wrong answer: ")
+    expectedAnswer = getExampleAnswer(pageTree,level)
+    if (exampleAnswer != expectedAnswer):
+        print(f"Wrong answer: {exampleAnswer}, expected: {expectedAnswer}")
         return
     print(sendAnswer(day, level, function(getInput(day))))
     pullProblem(day)
